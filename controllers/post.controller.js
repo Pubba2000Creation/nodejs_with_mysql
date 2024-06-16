@@ -41,8 +41,26 @@ function show(req, res) {
     });
 }
 
+function showAll(req, res) {
+   
+
+    models.Post.findAll().then(result => {
+        if (!result) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+        res.status(200).json(result);
+    }).catch(error => {
+        console.error("Error retrieving post:", error);
+        res.status(500).json({
+            message: "Something went wrong in the show function"
+        });
+    });
+}
+
+
 
 module.exports = {
     save: save,
-    show: show
+    show: show,
+    findAll:showAll
 };

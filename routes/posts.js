@@ -14,5 +14,10 @@ router.post("/", postController.save);
 //route for show post
 router.get("/:id",postController.show)
 
+
+//route for find all blog psot
+router.get("/",postController.findAll)
+
+
 // Export the router object so it can be used in other parts of the application
 module.exports = router;
