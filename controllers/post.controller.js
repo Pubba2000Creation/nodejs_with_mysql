@@ -1,16 +1,48 @@
-// This function handles the logic for the 'index' route, which will be used to display a list of posts.
-function index(req, res) {
-    // Define a constant variable named 'post' and assign it the string value "post list".
-    // In a real application, this could be a call to a database to fetch actual posts.
-    const post = "post list";
-    
-    // Send the response back to the client with the content of the 'post' variable.
-    // This will display the string "post list" to the client.
-    res.send(post);
+const models = require('../models');
+
+// Create new function to save a new blog post
+function save(req, res) {
+    // This object should have all the attributes we want to insert into the table
+    const post = {
+        title: req.body.title,
+        content: req.body.content,
+        imageUrl: req.body.imageUrl,
+        categoryId: req.body.categoryId,
+        userId: req.body.userId
+    };
+
+    models.Post.create(post).then(result => {
+        res.status(201).json({
+            message: "Post created successfully",
+            post: result
+        });
+    }).catch(error => {
+        res.status(500).json({
+            message: "Something went wrong",
+            error: error
+        });
+    });
 }
 
-// Export an object with the 'index' function as a property.
-// This makes the 'index' function available to be imported and used in other files.
+
+function show(req, res) {
+    const id = req.params.id; // Corrected to use req.params.id instead of req.param.id
+
+    models.Post.findByPk(id).then(result => {
+        if (!result) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+        res.status(200).json(result);
+    }).catch(error => {
+        console.error("Error retrieving post:", error);
+        res.status(500).json({
+            message: "Something went wrong in the show function"
+        });
+    });
+}
+
+
 module.exports = {
-    index: index
+    save: save,
+    show: show
 };

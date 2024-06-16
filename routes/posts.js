@@ -8,7 +8,11 @@ const postController = require('../controllers/post.controller');
 const router = express.Router();
 
 // Define a GET endpoint for the root URL ("/") and associate it with the 'index' function from postController
-router.get("/", postController.index);
+//
+router.post("/", postController.save);
+
+//route for show post
+router.get("/:id",postController.show)
 
 // Export the router object so it can be used in other parts of the application
 module.exports = router;
