@@ -1,3 +1,4 @@
+const { Where } = require('sequelize/lib/utils');
 const models = require('../models');
 
 // Create new function to save a new blog post
@@ -105,11 +106,46 @@ function update(req, res) {
     });
 }
 
+function destroy(req, res) {
+    // Getting the delete post id and userId from params
+    const id = req.params.id;
+    const userId = req.params.userId;
+
+    if (!id || !userId) {
+        return res.status(400).json({
+            message: "The object id and userId are required to process",
+        });
+    }
+
+    models.Post.destroy({
+        where: {
+            id: id,
+            userId: userId
+        }
+    }).then(result => {
+        if (result === 0) {
+            return res.status(404).json({
+                message: "Post not found or user not authorized",
+            });
+        }
+        res.status(200).json({
+            message: "Post deleted successfully",
+            result: result
+        });
+    }).catch(error => {
+        res.status(500).json({
+            message: "Post not deleted successfully",
+            error: error.message
+        });
+    });
+}
+
 
 
 module.exports = {
     save: save,
     show: show,
     index:index,
-    update:update
+    update:update,
+    destroy:destroy
 };

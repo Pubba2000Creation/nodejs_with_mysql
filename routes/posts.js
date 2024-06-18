@@ -23,5 +23,8 @@ router.get("/",postController.index);
 router.patch("/:id/:userId",postController.update);
 
 
+//route for deleteing post
+router.delete("/:id/:userId",postController.destroy);
+
 // Export the router object so it can be used in other parts of the application
 module.exports = router;
