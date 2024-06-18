@@ -13,11 +13,14 @@ const router = express.Router();
 router.post("/", postController.save);
 
 //route for show post
-router.get("/:id",postController.show)
+router.get("/:id",postController.show);
 
 
 //route for find all blog psot
-router.get("/",postController.findAll)
+router.get("/",postController.index);
+
+//route for the updateing 
+router.patch("/:id/:userId",postController.update);
 
 
 // Export the router object so it can be used in other parts of the application

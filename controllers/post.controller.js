@@ -41,7 +41,7 @@ function show(req, res) {
     });
 }
 
-function showAll(req, res) {
+function index(req, res) {
    
 
     models.Post.findAll().then(result => {
@@ -58,9 +58,58 @@ function showAll(req, res) {
 }
 
 
+// Function for updating a post
+function update(req, res) {
+    const id = req.params.id; 
+    const userId = req.params.userId; // Assuming userId is hardcoded for now
+
+    // Log the request body to troubleshoot issues
+    console.log('Request Params:', req.params);
+    console.log('Request Body:', req.body);
+
+    // Validate presence of required fields
+    if (!id || !userId) {
+        return res.status(400).json({
+            message: "Post ID and User ID are required"
+        });
+    }
+
+    const updatePost = {
+        title: req.body.title,
+        content: req.body.content,
+        imageUrl: req.body.imageUrl,
+        categoryId: req.body.categoryId,
+    };
+
+    models.Post.update(updatePost, {
+        where: {
+            id: id,
+            userId: userId
+        }
+    }).then(result => {
+        if (result[0] === 0) {
+            return res.status(404).json({
+                message: "Post not found or user not authorized"
+            });
+        }
+        res.status(200).json({
+            message: "Post updated successfully",
+            result: result
+        });
+    }).catch(error => {
+        console.error("Error updating post:", error);
+        res.status(500).json({
+            message: "Something went wrong in the update function",
+            error: error.message
+        });
+    });
+}
+
+
 
 module.exports = {
     save: save,
     show: show,
-    findAll:showAll
+    index:index,
+    update:update
 };
