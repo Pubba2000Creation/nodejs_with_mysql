@@ -1,3 +1,4 @@
+const Validator = require("fastest-validator")
 const { Where } = require('sequelize/lib/utils');
 const models = require('../models');
 
@@ -11,6 +12,48 @@ function save(req, res) {
         categoryId: req.body.categoryId,
         userId: req.body.userId
     };
+
+    const schema = {
+        type: "object",
+        properties: {
+          title: {
+            type: "string",
+            required: true,
+            minLength: 1, // Enforce a minimum title length
+            maxLength: 100,
+          },
+          content: {
+            type: "string",
+            required: true,
+            minLength: 1, // Enforce a minimum content length
+            maxLength: 500,
+          },
+          categoryId: {
+            type: "integer", // Use "integer" for category ID validation
+            required: true,
+          },
+          imageUrl: { // Include optional imageUrl with type validation
+            type: "string",
+            optional: true, // Mark imageUrl as optional
+          },
+          userId: {  // Include optional userId with type validation
+            type: "integer", // Assuming userId is an integer
+            optional: true,  // Mark userId as optional
+          },
+        },
+        additionalProperties: false, // Restrict additional properties for stricter validation
+      };
+
+    const v = new Validator();
+   const validationResponse=v.validate(post,schema);
+   if (validationResponse != true) {
+
+    return res.status(400).json({
+        message:"validation is failed",
+        errors:validationResponse
+    });
+    
+   } 
 
     models.Post.create(post).then(result => {
         res.status(201).json({
