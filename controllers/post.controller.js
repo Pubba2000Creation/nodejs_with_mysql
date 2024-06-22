@@ -1,5 +1,4 @@
-const Validator = require("fastest-validator")
-const { Where } = require('sequelize/lib/utils');
+const Validator = require('fastest-validator');
 const models = require('../models');
 
 // Create new function to save a new blog post
@@ -13,61 +12,46 @@ function save(req, res) {
         userId: req.body.userId
     };
 
+    // Define the schema for validation
     const schema = {
-        type: "object",
-        properties: {
-          title: {
-            type: "string",
-            required: true,
-            minLength: 1, // Enforce a minimum title length
-            maxLength: 100,
-          },
-          content: {
-            type: "string",
-            required: true,
-            minLength: 1, // Enforce a minimum content length
-            maxLength: 500,
-          },
-          categoryId: {
-            type: "integer", // Use "integer" for category ID validation
-            required: true,
-          },
-          imageUrl: { // Include optional imageUrl with type validation
-            type: "string",
-            optional: true, // Mark imageUrl as optional
-          },
-          userId: {  // Include optional userId with type validation
-            type: "integer", // Assuming userId is an integer
-            optional: true,  // Mark userId as optional
-          },
-        },
-        additionalProperties: false, // Restrict additional properties for stricter validation
-      };
+        title: { type: "string", min: 1, max: 100 },
+        content: { type: "string", min: 1, max: 500 },
+        categoryId: { type: "number", integer: true },
+        imageUrl: { type: "string", optional: true },
+        userId: { type: "number", integer: true, optional: true }
+    };
 
+    // Instantiate the validator
     const v = new Validator();
-   const validationResponse=v.validate(post,schema);
-   if (validationResponse != true) {
+    const validationResponse = v.validate(post, schema);
 
-    return res.status(400).json({
-        message:"validation is failed",
-        errors:validationResponse
-    });
-    
-   } 
+    // Check if validation failed
+    if (validationResponse !== true) {
+        // Return a 400 response with validation errors
+        return res.status(400).json({
+            message: "Validation failed",
+            errors: validationResponse
+        });
+    }
 
+    // Create the post in the database
     models.Post.create(post).then(result => {
+        // Return a 201 response with the created post
         res.status(201).json({
             message: "Post created successfully",
             post: result
         });
     }).catch(error => {
+        // Handle any errors during the create operation
         res.status(500).json({
             message: "Something went wrong",
-            error: error
+            error: error.message
         });
     });
 }
 
+
+// create function for show blog post
 
 function show(req, res) {
     const id = req.params.id; // Corrected to use req.params.id instead of req.param.id
@@ -125,6 +109,27 @@ function update(req, res) {
         categoryId: req.body.categoryId,
     };
 
+    // Define the schema for validation
+    const schema = {
+        title: { type: "string", min: 1, max: 100 },
+        content: { type: "string", min: 1, max: 500 },
+        categoryId: { type: "number", integer: true },
+        imageUrl: { type: "string", optional: true },
+        userId: { type: "number", integer: true, optional: true }
+    };
+
+    // Instantiate the validator
+    const v = new Validator();
+    const validationResponse = v.validate(updatePost, schema);
+
+    // Check if validation failed
+    if (validationResponse !== true) {
+        // Return a 400 response with validation errors
+        return res.status(400).json({
+            message: "Validation failed",
+            errors: validationResponse
+        });
+    }
     models.Post.update(updatePost, {
         where: {
             id: id,
