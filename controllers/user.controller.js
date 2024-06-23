@@ -60,6 +60,46 @@ function signup(req, res) {
     });
 }
 
+
+function login(req, res) {
+    // First, need to identify if there is a user with the given email address or not
+    models.User.findOne({ where: { email: req.body.email } })
+        .then(user => {
+            if (user === null) {
+                res.status(500).json({
+                    message: "Invalid credentials"
+                });
+            } else {
+                bcryptjs.compare(req.body.password, user.password, function(err, result) {
+                    // If the result is true, the password matches
+                    if (result) {
+                        // Generate access token for the user
+                        const token = jwt.sign({
+                            email: user.email,
+                            userId: user.id
+                        }, "secret", function(err, token) {
+                            res.status(200).json({
+                                message: "Authentication successful",
+                                token: token
+                            });
+                        });
+                    } else {
+                        res.status(500).json({
+                            message: "Invalid credentials"
+                        });
+                    }
+                });
+            }
+        })
+        .catch(error => {
+            res.status(500).json({
+                message: "The given email does not have an account"
+            });
+        });
+}
+
 module.exports = {
-    signup: signup // Exporting the signup function
+    signup: signup, // Exporting the signup function
+    login:login
+
 };
