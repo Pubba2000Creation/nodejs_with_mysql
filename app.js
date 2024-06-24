@@ -1,25 +1,25 @@
-// Import the Express library
-const express = require('express');
-//import body-parser to projrct
-const bodyParser =require('body-parser')
+const express = require('express'); // Import the Express library
+const bodyParser = require('body-parser'); // Import body-parser to parse incoming request bodies
+
+// Import routes from the routes directory
+const postRouter = require('./routes/posts'); // Import the post routes
+const userRouter = require('./routes/user'); // Import the user routes
+const imageRoutes = require("./routes/images"); // Import the image routes for uploading images
 
 // Create an instance of an Express application
 const app = express();
 
-// Import the post routes from the 'posts' module in the 'routes' directory
-const postRouter = require('./routes/posts');
-
-//add user routs to app.js
-const userRouter = require("./routes/user");
-
-//to use it as the middelware
+// Use body-parser middleware to parse JSON request bodies
 app.use(bodyParser.json());
 
 
-// Use the imported post routes for any requests to the "/posts" URL path
-// This means that any request to "/posts" will be handled by the 'postRouter'
-app.use("/posts", postRouter);
-app.use("/user",userRouter)
+// Serve the uploads directory as static files
+app.use('/uploads', express.static('uploads'));
+
+// Use the imported routes for the specified URL paths
+app.use("/posts", postRouter); // Routes for handling posts
+app.use("/user", userRouter); // Routes for handling users
+app.use("/images", imageRoutes); // Routes for handling image uploads
 
 // Export the Express application instance to be used in other parts of the application
 module.exports = app;
