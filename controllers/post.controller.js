@@ -9,16 +9,16 @@ function save(req, res) {
         content: req.body.content,
         imageUrl: req.body.imageUrl,
         categoryId: req.body.categoryId,
-        userId: req.body.userId
+        userId: req.userData.userId
     };
 
     // Define the schema for validation
     const schema = {
         title: { type: "string", min: 1, max: 100 },
         content: { type: "string", min: 1, max: 500 },
-        categoryId: { type: "number", integer: true },
-        imageUrl: { type: "string", optional: true },
-        userId: { type: "number", integer: true, optional: true }
+        categoryId: { type: "number", integer: true }
+        //imageUrl: { type: "string", optional: true },
+        
     };
 
     // Instantiate the validator
@@ -34,20 +34,40 @@ function save(req, res) {
         });
     }
 
-    // Create the post in the database
-    models.Post.create(post).then(result => {
-        // Return a 201 response with the created post
-        res.status(201).json({
-            message: "Post created successfully",
-            post: result
-        });
-    }).catch(error => {
-        // Handle any errors during the create operation
-        res.status(500).json({
-            message: "Something went wrong",
-            error: error.message
-        });
-    });
+      // Check if the category exists
+      models.Category.findByPk(req.body.categoryId)
+      .then(category => {
+          if (category !== null) {
+              // If the category exists, create the post
+              models.Post.create(post)
+                  .then(result => {
+                      // Return a 201 response with the created post
+                      res.status(201).json({
+                          message: "Post created successfully",
+                          post: result
+                      });
+                  })
+                  .catch(error => {
+                      // Handle any errors during the create operation
+                      res.status(500).json({
+                          message: "Something went wrong",
+                          error: error.message
+                      });
+                  });
+          } else {
+              // If the category is not found, return a 400 response
+              res.status(400).json({
+                  message: "Invalid category"
+              });
+          }
+      })
+      .catch(error => {
+          // Handle any errors during the find operation
+          res.status(500).json({
+              message: "Something went wrong",
+              error: error.message
+          });
+      });
 }
 
 
@@ -88,12 +108,8 @@ function index(req, res) {
 
 // Function for updating a post
 function update(req, res) {
-    const id = req.params.id; 
-    const userId = req.params.userId; // Assuming userId is hardcoded for now
-
-    // Log the request body to troubleshoot issues
-    console.log('Request Params:', req.params);
-    console.log('Request Body:', req.body);
+    const id = req.params.id;
+    const userId = req.params.userId; // Assuming userId is passed as a parameter
 
     // Validate presence of required fields
     if (!id || !userId) {
@@ -102,6 +118,11 @@ function update(req, res) {
         });
     }
 
+    // Log the request body to troubleshoot issues
+    console.log('Request Params:', req.params);
+    console.log('Request Body:', req.body);
+
+    // Prepare the updated post object
     const updatePost = {
         title: req.body.title,
         content: req.body.content,
@@ -114,8 +135,7 @@ function update(req, res) {
         title: { type: "string", min: 1, max: 100 },
         content: { type: "string", min: 1, max: 500 },
         categoryId: { type: "number", integer: true },
-        imageUrl: { type: "string", optional: true },
-        userId: { type: "number", integer: true, optional: true }
+        imageUrl: { type: "string", optional: true }
     };
 
     // Instantiate the validator
@@ -130,28 +150,49 @@ function update(req, res) {
             errors: validationResponse
         });
     }
-    models.Post.update(updatePost, {
-        where: {
-            id: id,
-            userId: userId
-        }
-    }).then(result => {
-        if (result[0] === 0) {
-            return res.status(404).json({
-                message: "Post not found or user not authorized"
+
+    // Check if the category exists before updating the post
+    models.Category.findByPk(req.body.categoryId)
+        .then(category => {
+            if (!category) {
+                return res.status(400).json({
+                    message: "Invalid category"
+                });
+            }
+
+            // Update the post
+            models.Post.update(updatePost, {
+                where: {
+                    id: id,
+                    userId: userId
+                }
+            })
+            .then(result => {
+                if (result[0] === 0) {
+                    return res.status(404).json({
+                        message: "Post not found or user not authorized"
+                    });
+                }
+                res.status(200).json({
+                    message: "Post updated successfully",
+                    result: result
+                });
+            })
+            .catch(error => {
+                console.error("Error updating post:", error);
+                res.status(500).json({
+                    message: "Something went wrong in the update function",
+                    error: error.message
+                });
             });
-        }
-        res.status(200).json({
-            message: "Post updated successfully",
-            result: result
+        })
+        .catch(error => {
+            console.error("Error finding category:", error);
+            res.status(500).json({
+                message: "Something went wrong",
+                error: error.message
+            });
         });
-    }).catch(error => {
-        console.error("Error updating post:", error);
-        res.status(500).json({
-            message: "Something went wrong in the update function",
-            error: error.message
-        });
-    });
 }
 
 function destroy(req, res) {
