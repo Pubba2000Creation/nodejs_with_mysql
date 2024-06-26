@@ -5,6 +5,7 @@ const bodyParser = require('body-parser'); // Import body-parser to parse incomi
 const postRouter = require('./routes/posts'); // Import the post routes
 const userRouter = require('./routes/user'); // Import the user routes
 const imageRoutes = require("./routes/images"); // Import the image routes for uploading images
+const testRoutes = require('./routes/test');
 
 // Create an instance of an Express application
 const app = express();
@@ -20,6 +21,7 @@ app.use('/uploads', express.static('uploads'));
 app.use("/posts", postRouter); // Routes for handling posts
 app.use("/user", userRouter); // Routes for handling users
 app.use("/images", imageRoutes); // Routes for handling image uploads
+app.use("/test",testRoutes);
 
 // Export the Express application instance to be used in other parts of the application
 module.exports = app;

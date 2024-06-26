@@ -109,7 +109,7 @@ function index(req, res) {
 // Function for updating a post
 function update(req, res) {
     const id = req.params.id;
-    const userId = req.params.userId; // Assuming userId is passed as a parameter
+    const userId = req.userData.userId;
 
     // Validate presence of required fields
     if (!id || !userId) {

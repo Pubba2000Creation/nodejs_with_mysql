@@ -32,11 +32,11 @@ router.get("/:id",postController.show);
 router.get("/",postController.index);
 
 //route for the updateing 
-router.patch("/:id/:userId",checkAuthMiddelware.checkAuth,postController.update);
+router.patch("/:id",checkAuthMiddelware.checkAuth,postController.update);
 
 
 //route for deleteing post
-router.delete("/:id/:userId",checkAuthMiddelware.checkAuth,postController.destroy);
+router.delete("/:id",checkAuthMiddelware.checkAuth,postController.destroy);
 
 // Export the router object so it can be used in other parts of the application
 module.exports = router;
