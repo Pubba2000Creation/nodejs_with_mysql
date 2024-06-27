@@ -6,6 +6,7 @@ const postRouter = require('./routes/posts'); // Import the post routes
 const userRouter = require('./routes/user'); // Import the user routes
 const imageRoutes = require("./routes/images"); // Import the image routes for uploading images
 const testRoutes = require('./routes/test');
+const commentRouter = require('./routes/comments'); // Import the comments routes
 
 // Create an instance of an Express application
 const app = express();
@@ -21,7 +22,9 @@ app.use('/uploads', express.static('uploads'));
 app.use("/posts", postRouter); // Routes for handling posts
 app.use("/user", userRouter); // Routes for handling users
 app.use("/images", imageRoutes); // Routes for handling image uploads
-app.use("/test",testRoutes);
+app.use("/test",testRoutes); // rote for handel the testing
+app.use('/comments',commentRouter); // route for handeling comments
+
 
 // Export the Express application instance to be used in other parts of the application
 module.exports = app;

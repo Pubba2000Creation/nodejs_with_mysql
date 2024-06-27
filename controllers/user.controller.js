@@ -89,7 +89,7 @@ function login(req, res) {
                         });
                     } else {
                         res.status(500).json({
-                            message: "Invalid credentials"
+                            message: "Invalid password"
                         });
                     }
                 });
