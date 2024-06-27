@@ -186,7 +186,7 @@ function destroy(req, res) {
 
 module.exports = {
     save: save,
-    show: show,
+    showOne: show,
     index: index,
     update: update,
     destroy: destroy
