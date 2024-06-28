@@ -5,7 +5,7 @@ const models = require('../models');
 function createNew(req, res) {
     const address = {
         address: req.body.address,
-        userId: req.body.userId,
+        userId: req.userData.userId, // Using userData from authentication middleware
         mobile: req.body.mobile
     };
 
@@ -27,34 +27,32 @@ function createNew(req, res) {
     }
 
     // Check if the userId exists
-    models.User.findByPk(req.body.userId).then(user => {
-        if (user === null) {
-            return res.status(404).json({
-                message: "User not found"
-            });
-        } else {
+    models.User.findByPk(req.userData.userId)
+        .then(user => {
+            if (!user) {
+                return res.status(404).json({
+                    message: "User not found"
+                });
+            }
+
             // Save the new address
-            models.Address.create(address).then(result => {
-                res.status(201).json({
-                    message: "Address created successfully",
-                    address: result
-                });
-            }).catch(error => {
-                console.error("Error creating address:", error);
-                res.status(500).json({
-                    message: "Error creating address",
-                    error: error.message || error
-                });
+            return models.Address.create(address);
+        })
+        .then(result => {
+            res.status(201).json({
+                message: "Address created successfully",
+                address: result
             });
-        }
-    }).catch(error => {
-        console.error("Error finding user:", error);
-        res.status(500).json({
-            message: "Error finding user",
-            error: error.message || error
+        })
+        .catch(error => {
+            console.error("Error creating address:", error);
+            res.status(500).json({
+                message: "Error creating address",
+                error: error.message || error
+            });
         });
-    });
 }
+
 
 
 function index(req, res) {
@@ -102,7 +100,7 @@ function showOne(req,res){
 
 function update(req, res) {
     const id = req.params.id;
-    const userId = req.body.userId; // Assuming this is coming from the request body for now
+    const userId = req.userData.userId; // Assuming this is coming from the request body for now
 
     const updateAddress = {
         address: req.body.address,
@@ -146,7 +144,7 @@ function update(req, res) {
 
 function destroy(req, res) {
     const id = req.params.id;
-    const userId = req.body.userId; // Assuming userId is passed in the request body
+    const userId = req.userData.userId; // Assuming userId is passed in the request body
 
     models.Address.destroy({ where: { id: id, userId: userId } })
         .then(result => {

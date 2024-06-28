@@ -5,11 +5,11 @@ const checkAuthMiddleware = require("../middleware/check-auth");
 const router = express.Router();
 
 
-router.post("/",addressController.createNew);
+router.post("/",checkAuthMiddleware.checkAuth,addressController.createNew);
 router.get("/", addressController.show);
 router.get("/:id", addressController.showOne);
-//router.patch("/:id", checkAuthMiddleware.checkAuth, addressController.update);
-//router.delete("/:id", checkAuthMiddleware.checkAuth,addressController.destroy);
+router.patch("/:id", checkAuthMiddleware.checkAuth, addressController.update);
+router.delete("/:id", checkAuthMiddleware.checkAuth,addressController.destroy);
 
 
 
