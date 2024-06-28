@@ -10,13 +10,25 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     mobile: {
-      type: DataTypes.INTEGER, // or DataTypes.INTEGER depending on how you want to store it
-      allowNull: true // assuming mobile number can be optional
+      type: DataTypes.STRING, // Store mobile as a string to handle leading zeros
+      allowNull: true // Assuming mobile number can be optional
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
     }
-  }, {});
+  }, {
+    timestamps: true // Enable timestamps in Sequelize
+  });
 
   Address.associate = function(models) {
-    // associations can be defined here
+    // Associations can be defined here
     Address.belongsTo(models.User, {
       foreignKey: 'userId',
       onDelete: 'CASCADE'
