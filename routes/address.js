@@ -6,10 +6,10 @@ const router = express.Router();
 
 
 router.post("/",addressController.createNew);
-//router.get("/", commentController.index);
-//router.get("/:id", commentController.showOne);
-//router.patch("/:id", checkAuthMiddleware.checkAuth, commentController.update);
-//router.delete("/:id", checkAuthMiddleware.checkAuth,commentController.destroy);
+router.get("/", addressController.show);
+router.get("/:id", addressController.showOne);
+//router.patch("/:id", checkAuthMiddleware.checkAuth, addressController.update);
+//router.delete("/:id", checkAuthMiddleware.checkAuth,addressController.destroy);
 
 
 
